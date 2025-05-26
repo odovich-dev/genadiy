@@ -60,4 +60,5 @@ output_dir: runs/gsm8k/multinode/Qwen2.5-0.5B-Instruct-Gensyn-Swarm
 EOF
 
 # Запуск в screen
-screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && printf "A\n0.5\n" | ./run_rl_swarm.sh'
+# screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && printf "A\n0.5\n" | ./run_rl_swarm.sh'
+screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && ./run_rl_swarm.sh'
