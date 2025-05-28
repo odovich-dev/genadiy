@@ -12,7 +12,7 @@ sudo apt update && sudo apt install -y yarn
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
 # Клонирование RL Swarm
-rm -rf rl-swarm && git clone https://github.com/zunxbt/rl-swarm.git
+rm -rf rl-swarm && git clone https://github.com/gensyn-ai/rl-swarm.git
 cd rl-swarm
 
 # Обновление конфигурации
