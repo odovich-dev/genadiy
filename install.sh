@@ -12,8 +12,11 @@ sudo apt update && sudo apt install -y yarn
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
 # Клонирование RL Swarm
-rm -rf rl-swarm && git clone https://github.com/odovich-dev/rl-swarm.git
+if [ ! -d "rl-swarm" ]; then
+  git clone https://github.com/odovich-dev/rl-swarm.git
+fi
 cd rl-swarm
+git pull
 
 # Обработка входных параметров
 MAX_STEPS="${1:-30}"            # По умолчанию 30
