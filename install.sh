@@ -54,4 +54,4 @@ fi
 
 # Запуск в screen
 # Для Ctrl+C без уничтожения сессии добавляем exec bash в screen
-screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && ./run_rl_swarm.sh; exec bash'
+screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && ./run_rl_swarm.sh; exec bash -i'
