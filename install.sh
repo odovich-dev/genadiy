@@ -21,7 +21,6 @@ git pull
 # Обработка входных параметров
 MAX_STEPS="${1:-30}"            # По умолчанию 30
 TORCH_DTYPE="${2:-16}"          # По умолчанию 16 = float16
-ARCHIVE_NAME="${3:-backup}"     # По умолчанию backup
 
 # Конвертируем dtype в текст
 if [ "$TORCH_DTYPE" == "16" ]; then
@@ -57,5 +56,5 @@ else
 fi
 
 # Запуск в screen
-screen -dmS gensyn bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && trap "" SIGINT && ./run_rl_swarm.sh "'"$ARCHIVE_NAME"'" ; exec bash -i' &
+screen -dmS gensyn bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && trap "" SIGINT && ./run_rl_swarm.sh; exec bash -i' &
 disown
