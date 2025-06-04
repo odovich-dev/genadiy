@@ -42,5 +42,16 @@ sed -i "s/^torch_dtype: .*/torch_dtype: $TORCH_DTYPE_TEXT/" "$CONFIG_FILE"
 
 echo "✅ Конфигурация успешно обновлена."
 
+# Проверяем наличие архива вида число.tar в /root
+ARCHIVE_FOUND=$(find /root -maxdepth 1 -type f -name '[0-9]*.tar' | head -n 1)
+if [ -n "$ARCHIVE_FOUND" ]; then
+    echo "📦 Найден архив $ARCHIVE_FOUND. Распаковываю..."
+    tar -xvf "$ARCHIVE_FOUND" -C /
+    echo "✅ Архив успешно распакован!"
+else
+    echo "ℹ️  Архивов для распаковки не найдено."
+fi
+
 # Запуск в screen
-screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && ./run_rl_swarm.sh'
+# Для Ctrl+C без уничтожения сессии добавляем exec bash в screen
+screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && ./run_rl_swarm.sh; exec bash'
