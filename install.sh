@@ -12,53 +12,35 @@ sudo apt update && sudo apt install -y yarn
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
 # Клонирование RL Swarm
-rm -rf rl-swarm && git clone https://github.com/gensyn-ai/rl-swarm.git
+rm -rf rl-swarm && git clone https://github.com/odovich-dev/rl-swarm.git
 cd rl-swarm
 
+# Обработка входных параметров
+MAX_STEPS="${1:-30}"            # По умолчанию 30
+TORCH_DTYPE="${2:-16}"          # По умолчанию 16 = float16
+
+# Конвертируем dtype в текст
+if [ "$TORCH_DTYPE" == "16" ]; then
+    TORCH_DTYPE_TEXT="float16"
+elif [ "$TORCH_DTYPE" == "32" ]; then
+    TORCH_DTYPE_TEXT="float32"
+else
+    echo "❌ Неверное значение torch_dtype: $TORCH_DTYPE. Используй 16 или 32."
+    exit 1
+fi
+
+echo "✅ Установка конфигурации: max_steps=$MAX_STEPS, torch_dtype=$TORCH_DTYPE_TEXT"
+
 # Обновление конфигурации
-cat > hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml <<EOF
-# Model arguments
-model_revision: main
-torch_dtype: float32 
-bf16: false
-tf32: false
+CONFIG_FILE="hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml"
 
-# Dataset arguments
-dataset_id_or_path: 'openai/gsm8k'
+# Заменяем max_steps
+sed -i "s/^max_steps: .*/max_steps: $MAX_STEPS/" "$CONFIG_FILE"
 
-# Training arguments
-max_steps: 15 
-gradient_accumulation_steps: 4
-gradient_checkpointing: false 
-learning_rate: 5.0e-7
-lr_scheduler_type: cosine
-warmup_ratio: 0.03
+# Заменяем torch_dtype
+sed -i "s/^torch_dtype: .*/torch_dtype: $TORCH_DTYPE_TEXT/" "$CONFIG_FILE"
 
-# GRPO arguments
-use_vllm: false
-num_generations: 2
-per_device_train_batch_size: 1
-beta: 0.001
-max_prompt_length: 256
-max_completion_length: 384
-
-# Logging arguments
-logging_strategy: steps
-logging_steps: 2
-report_to:
-- tensorboard
-save_strategy: "steps"
-save_steps: 25
-seed: 42
-
-# Script arguments
-max_rounds: 10000
-
-# Model-specific arguments
-model_name_or_path: unsloth/Qwen2.5-0.5B-Instruct
-output_dir: runs/gsm8k/multinode/Qwen2.5-0.5B-Instruct-Gensyn-Swarm
-EOF
+echo "✅ Конфигурация успешно обновлена."
 
 # Запуск в screen
-# screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && printf "A\n0.5\n" | ./run_rl_swarm.sh'
 screen -S gensyn -dm bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && ./run_rl_swarm.sh'
