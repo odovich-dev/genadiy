@@ -11,12 +11,15 @@ sudo apt update && sudo apt install -y yarn
 # Установка Node
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
+# Проверка и убийство старых screen-сессий
+killall screen 2>/dev/null || true
+
+# Убиваем процессы, слушающие порт 3000 (node и туннель)
+lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+
 # Клонирование RL Swarm
-if [ ! -d "rl-swarm" ]; then
-  git clone https://github.com/odovich-dev/rl-swarm.git
-fi
+rm -rf rl-swarm && git clone https://github.com/odovich-dev/rl-swarm.git
 cd rl-swarm
-git pull
 
 # Обработка входных параметров
 MAX_STEPS="${1:-30}"            # По умолчанию 30
@@ -54,12 +57,6 @@ if [ -n "$ARCHIVE_FOUND" ]; then
 else
     echo "ℹ️  Архивов для распаковки не найдено."
 fi
-
-# Проверка и убийство старых screen-сессий
-killall screen 2>/dev/null || true
-
-# Убиваем процессы, слушающие порт 3000 (node и туннель)
-lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 # Запуск в screen
 screen -dmS gensyn bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && trap "" SIGINT && ./run_rl_swarm.sh; exec bash -i' &
