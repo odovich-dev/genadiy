@@ -1,17 +1,21 @@
 #!/bin/bash
 
 # Установка зависимостей
-sudo apt update && sudo apt install -y python3 python3-venv python3-pip curl screen git gnupg npm
+sudo apt update && sudo apt install -y python3 python3-venv python3-pip curl screen git gnupg
 
-# Установка Yarn
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+# Установка Yarn (обновленный способ)
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/yarn.gpg >/dev/null
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt update && sudo apt install -y yarn
 
 # Установка Node
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
-# Установка глобальных npm пакетов
+# Обновление переменных окружения для текущей сессии
+export PATH="$HOME/.local/bin:$PATH"
+source ~/.bashrc 2>/dev/null || true
+
+# Установка глобальных npm пакетов (после установки Node)
 sudo npm install -g yarn
 sudo npm install -g n
 sudo npm install encoding pino-pretty
