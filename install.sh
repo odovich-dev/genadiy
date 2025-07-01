@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Установка зависимостей
-sudo apt update && sudo apt install -y python3 python3-venv python3-pip curl screen git gnupg
+sudo apt update && sudo apt install -y python3 python3-venv python3-pip curl screen git gnupg npm
 
 # Установка Yarn
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -11,6 +11,15 @@ sudo apt update && sudo apt install -y yarn
 # Установка Node
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
+# Установка глобальных npm пакетов
+sudo npm install -g yarn
+sudo npm install -g n
+sudo npm install encoding pino-pretty
+
+# Установка LTS версии Node и конкретной версии
+sudo n lts
+n 20.18.0
+
 # Проверка и убийство старых screen-сессий
 killall screen 2>/dev/null || true
 
@@ -18,21 +27,7 @@ killall screen 2>/dev/null || true
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 # Обработка входных параметров
-RECLONE="${3:-n}"                 # Параметр для управления клонированием (по умолчанию 'n')
-MAX_STEPS="${1:-30}"             # По умолчанию 30
-TORCH_DTYPE="${2:-16}"          # По умолчанию 16 = float16
-
-# Обработка параметра torch_dtype
-if [ "$TORCH_DTYPE" == "16" ]; then
-    TORCH_DTYPE_TEXT="float16"
-elif [ "$TORCH_DTYPE" == "32" ]; then
-    TORCH_DTYPE_TEXT="float32"
-else
-    echo "❌ Неверное значение torch_dtype: $TORCH_DTYPE. Используй 16 или 32."
-    exit 1
-fi
-
-echo "✅ Установка конфигурации: max_steps=$MAX_STEPS, torch_dtype=$TORCH_DTYPE_TEXT, reclone=$RECLONE"
+RECLONE="${1:-n}"                 # Параметр для управления клонированием (по умолчанию 'n')
 
 # Работа с репозиторием RL Swarm
 if [ "$RECLONE" == "y" ]; then
@@ -50,24 +45,25 @@ else
     git pull
 fi
 
-# Обновление конфигурации
-CONFIG_FILE="hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml"
-
-sed -i "s/^max_steps: .*/max_steps: $MAX_STEPS/" "$CONFIG_FILE"
-sed -i "s/^torch_dtype: .*/torch_dtype: $TORCH_DTYPE_TEXT/" "$CONFIG_FILE"
-
-echo "✅ Конфигурация успешно обновлена."
-
 # Проверяем наличие архива вида число.tar в /root
 ARCHIVE_FOUND=$(find /root -maxdepth 1 -type f -name '[0-9]*.tar' | head -n 1)
 if [ -n "$ARCHIVE_FOUND" ]; then
     echo "📦 Найден архив $ARCHIVE_FOUND. Распаковываю..."
     tar -xvf "$ARCHIVE_FOUND" -C /root
     echo "✅ Архив успешно распакован!"
+    
+    # Удаление файлов из папки temp-data
+    if [ -d "/root/rl-swarm/modal-login/temp-data/" ]; then
+        echo "🗑️  Удаляю файлы из /root/rl-swarm/modal-login/temp-data/..."
+        rm -rf /root/rl-swarm/modal-login/temp-data/*
+        echo "✅ Файлы из temp-data успешно удалены!"
+    else
+        echo "ℹ️  Папка /root/rl-swarm/modal-login/temp-data/ не найдена."
+    fi
 else
     echo "ℹ️  Архивов для распаковки не найдено."
 fi
 
 # Запуск в screen
-screen -dmS gensyn bash -c 'cd ~/rl-swarm && python3 -m venv .venv && source .venv/bin/activate && trap "" SIGINT && ./run_rl_swarm.sh; exec bash -i' &
+screen -dmS gensyn bash -c 'cd ~/rl-swarm && if [ ! -d ".venv" ]; then python3 -m venv .venv; fi && source .venv/bin/activate && pip install --upgrade pip && pip install accelerate==1.7 && trap "" SIGINT && ./run_rl_swarm.sh; exec bash -i' &
 disown
