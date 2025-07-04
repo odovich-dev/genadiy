@@ -55,15 +55,6 @@ if [ -n "$ARCHIVE_FOUND" ]; then
     echo "📦 Найден архив $ARCHIVE_FOUND. Распаковываю..."
     tar -xvf "$ARCHIVE_FOUND" -C /root
     echo "✅ Архив успешно распакован!"
-    
-    # Удаление файлов из папки temp-data
-    if [ -d "/root/rl-swarm/modal-login/temp-data/" ]; then
-        echo "🗑️  Удаляю файлы из /root/rl-swarm/modal-login/temp-data/..."
-        rm -rf /root/rl-swarm/modal-login/temp-data/*
-        echo "✅ Файлы из temp-data успешно удалены!"
-    else
-        echo "ℹ️  Папка /root/rl-swarm/modal-login/temp-data/ не найдена."
-    fi
 else
     echo "ℹ️  Архивов для распаковки не найдено."
 fi
