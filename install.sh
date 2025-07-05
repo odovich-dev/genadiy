@@ -25,7 +25,7 @@ sudo n lts
 n 20.18.0
 
 # Проверка и убийство старых screen-сессий
-killall screen 2>/dev/null || true
+screen -ls | grep "\.gensyn" | cut -d. -f1 | awk '{print $1}' | xargs -r kill
 
 # Убиваем процессы, слушающие порт 3000 (node и туннель)
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
