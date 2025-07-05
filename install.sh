@@ -18,7 +18,6 @@ source ~/.bashrc 2>/dev/null || true
 # Установка глобальных npm пакетов (после установки Node)
 sudo npm install -g yarn
 sudo npm install -g n
-sudo npm install encoding pino-pretty
 
 # Установка LTS версии Node и конкретной версии
 sudo n lts
