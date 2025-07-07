@@ -44,6 +44,7 @@ if [[ -z "$HIVEMIND_BACKEND" ]]; then
   exit 1
 fi
 
+
 echo "📝 Замена содержимого $HIVEMIND_BACKEND"
 
 cat > "$HIVEMIND_BACKEND" <<'EOF'
