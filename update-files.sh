@@ -37,7 +37,12 @@ skip && /^    - / {
 { print }
 ' ./rgym_exp/config/rg-swarm.yaml > ./rgym_exp/config/rg-swarm.yaml.tmp && mv ./rgym_exp/config/rg-swarm.yaml.tmp ./rgym_exp/config/rg-swarm.yaml
 
-HIVEMIND_BACKEND="./.venv/lib/python3.12/site-packages/genrl/communication/hivemind/hivemind_backend.py"
+HIVEMIND_BACKEND=$(find .venv/lib/ -type f -path "*/site-packages/genrl/communication/hivemind/hivemind_backend.py" | head -n 1)
+
+if [[ -z "$HIVEMIND_BACKEND" ]]; then
+  echo "❌ Не удалось найти hivemind_backend.py"
+  exit 1
+fi
 
 echo "📝 Замена содержимого $HIVEMIND_BACKEND"
 
