@@ -11,6 +11,20 @@ sudo apt update && sudo apt install -y yarn
 # Установка Node
 curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/node.sh | bash
 
+# Установка необходимых системных пакетов: build-essential и python3.12-dev (или python3.10-dev при ошибке)
+echo "🔧 Устанавливаю build-essential и python3.12-dev (с fallback на python3.10-dev)..."
+
+sudo apt-get update
+sudo apt-get install -y build-essential software-properties-common
+
+# Попытка установить Python 3.12 и dev-пакет
+if sudo add-apt-repository -y ppa:deadsnakes/ppa && sudo apt-get update && sudo apt-get install -y python3.12 python3.12-dev; then
+    echo "✅ Установлен Python 3.12 и python3.12-dev"
+else
+    echo "⚠️  Python 3.12 не найден, устанавливаю python3.10-dev..."
+    sudo apt-get install -y python3.10-dev
+fi
+
 # Обновление переменных окружения для текущей сессии
 export PATH="$HOME/.local/bin:$PATH"
 source ~/.bashrc 2>/dev/null || true
